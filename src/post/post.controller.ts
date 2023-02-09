@@ -16,18 +16,20 @@ import {
   import { AuthenticatedUser } from '../user/user.decorator';
   import { UserAuthGuard } from '../user/user.guard';
   @UsePipes(ValidationPipe)
-  @Controller('user')
+  @Controller('post')
   export class PostController {
     constructor(private readonly postService: PostService) {}
   
     @Get()
-    findAll(): Promise<Posts[]> {
-      return this.postService.findAll();
+    @UseGuards(UserAuthGuard)
+    findAll(@AuthenticatedUser() user: any): Promise<Posts[]> {
+      return this.postService.findAll(user.id);
     }
   
     @Get(':id')
-    findOne(@Param('id') id): Promise<Posts> {
-      return this.postService.findOne(id);
+    @UseGuards(UserAuthGuard)
+    findOne(@Param('id') id, @AuthenticatedUser() user: any): Promise<Posts> {
+      return this.postService.findOne(id, user.id);
     }
   
     @Post('')
@@ -41,12 +43,17 @@ import {
   
     @Delete(':id')
     @UseGuards(UserAuthGuard)
-    delete(@Param('id') id): Promise<void> {
-      return this.postService.remove(id);
+    delete(@Param('id') id, @AuthenticatedUser() user: any): Promise<void> {
+      return this.postService.remove(id, user.id);
     }
   
     @Put(':id')
-    update(@Body() createData: CreatePostDto, @Param('id') id): Promise<Posts> {
-      return this.postService.update(id, createData);
+    @UseGuards(UserAuthGuard)
+    update(
+      @Body() createData: CreatePostDto,
+      @Param('id') id,
+      @AuthenticatedUser() user: any,
+    ): Promise<Posts> {
+      return this.postService.update(id, createData, user.id);
     }
   }

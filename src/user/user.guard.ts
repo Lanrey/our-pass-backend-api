@@ -1,23 +1,15 @@
-import {
-    ExecutionContext,
-    Injectable,
-    UnauthorizedException,
-  } from '@nestjs/common';
-  import { AuthGuard } from '@nestjs/passport';
-  
-  @Injectable()
-  export class UserAuthGuard extends AuthGuard('jwt-user-strategy') {
-    handleRequest(err: any, user: any, info: any) {
-      if (err || !user) {
-        throw (
-          err ||
-          new UnauthorizedException({
-            status: 'error',
-            message: 'Unauthorized',
-          })
-        );
-      }
-      return user;
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { JsonWebTokenError } from 'jsonwebtoken';
+
+@Injectable()
+export class UserAuthGuard extends AuthGuard('jwt') {
+  handleRequest(err: any, user: any, info: any, context: any, status: any) {
+    console.log({ info, err });
+    if (info instanceof JsonWebTokenError) {
+      throw new UnauthorizedException('Invalid JWT');
     }
+
+    return super.handleRequest(err, user, info, context, status);
   }
-  
+}

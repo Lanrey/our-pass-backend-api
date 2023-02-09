@@ -11,13 +11,13 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    PassportModule.register({ defaultStrategy: 'jwt-user-strategy' }),
+    // PassportModule.register({ defaultStrategy: 'jwt-user-strategy' }),
     JwtModule.register({
       secret: config.jwtSecret,
       signOptions: { expiresIn: '60s' },
     }),
   ],
-  providers: [UserService],
+  providers: [UserService, JwtUserStrategy],
   controllers: [UserController],
   exports: [UserService],
 })

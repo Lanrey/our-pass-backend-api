@@ -14,19 +14,37 @@ import {
       private postRepository: Repository<Posts>,
     ) {}
   
-    findAll(): Promise<Posts[]> {
-      return this.postRepository.find();
-    }
-  
-    findOne(id: number): Promise<Posts> {
-      return this.postRepository.findOne({
+    findAll(user: number): Promise<Posts[]> {
+      return this.postRepository.find({
         where: {
-          id,
+          user,
         },
       });
     }
   
-    async remove(id: string): Promise<void> {
+    findOne(id: number, user: number): Promise<Posts> {
+      return this.postRepository.findOne({
+        where: {
+          id,
+          user,
+        },
+      });
+    }
+  
+    async remove(id: string, user: number): Promise<void> {
+      const post = await this.postRepository.find({
+        where: {
+          id,
+          user,
+        },
+      });
+  
+      if (!post) {
+        throw new BadRequestException({
+          status: 'error',
+          message: 'Post Not found',
+        });
+      }
       await this.postRepository.delete(id);
     }
   
@@ -48,10 +66,11 @@ import {
       return this.postRepository.save(updatedPost);
     }
   
-    async update(id, data): Promise<Posts> {
+    async update(id: number, data: any, user: number): Promise<Posts> {
       const post = await this.postRepository.findOne({
         where: {
           id,
+          user,
         },
       });
   
@@ -74,4 +93,3 @@ import {
       return { ...postObject };
     }
   }
-  
