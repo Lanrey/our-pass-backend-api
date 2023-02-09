@@ -8,12 +8,13 @@ import {
     Param,
     UsePipes,
     ValidationPipe,
+    UseGuards,
   } from '@nestjs/common';
   import { CreatePostDto } from './dto/create.dto';
   import { PostService } from './post.service';
   import { Posts } from './post.entity';
   import { AuthenticatedUser } from '../user/user.decorator';
-  
+  import { UserAuthGuard } from '../user/user.guard';
   @UsePipes(ValidationPipe)
   @Controller('user')
   export class PostController {
@@ -30,6 +31,7 @@ import {
     }
   
     @Post('')
+    @UseGuards(UserAuthGuard)
     create(
       @Body() createData: CreatePostDto,
       @AuthenticatedUser() user: any,
@@ -38,6 +40,7 @@ import {
     }
   
     @Delete(':id')
+    @UseGuards(UserAuthGuard)
     delete(@Param('id') id): Promise<void> {
       return this.postService.remove(id);
     }
@@ -47,4 +50,3 @@ import {
       return this.postService.update(id, createData);
     }
   }
-  
